@@ -132,7 +132,7 @@ tr:hover td { background:#f9fafb; }
       <div class="sub">Pepper Content × Club Alliance</div>
     </div>
   </div>
-  <div class="hdr-badge" id="lastUpdatedBadge">Week: 2 Nov – 8 Nov 2026</div>
+  <div class="hdr-badge" id="lastUpdatedBadge">Week: 9 Nov – 15 Nov 2026</div>
 </div>
 
 
@@ -142,6 +142,8 @@ tr:hover td { background:#f9fafb; }
   <div class="tab" onclick="switchTab('wow')">📊 Week on Week</div>
   <div class="tab" onclick="switchTab('mom')">📅 Month on Month</div>
   <div class="tab" onclick="switchTab('pages')">📄 Pages</div>
+  <div class="tab" onclick="switchTab('keywordrank')">🔑 Keyword Rank</div>
+  <div class="tab" onclick="switchTab('rankbucket')">🪣 Rank Bucket</div>
 </div>
 
 <div class="main">
@@ -289,8 +291,8 @@ tr:hover td { background:#f9fafb; }
           <thead>
             <tr>
               <th rowspan="2" style="border-bottom:2px solid #e5e7eb;vertical-align:bottom">URL ↑</th>
-              <th colspan="2" style="text-align:center;color:#4f46e5;font-size:10px;border-bottom:2px solid #4f46e5;padding-bottom:5px" id="currWeekHeader">2 NOV–8 NOV</th>
-              <th colspan="2" style="text-align:center;color:#9ca3af;font-size:10px;border-bottom:2px solid #e5e7eb;padding-bottom:5px" id="prevWeekHeader">26 OCT–1 NOV</th>
+              <th colspan="2" style="text-align:center;color:#4f46e5;font-size:10px;border-bottom:2px solid #4f46e5;padding-bottom:5px" id="currWeekHeader">9 NOV–15 NOV</th>
+              <th colspan="2" style="text-align:center;color:#9ca3af;font-size:10px;border-bottom:2px solid #e5e7eb;padding-bottom:5px" id="prevWeekHeader">2 NOV–8 NOV</th>
               <th colspan="2" style="text-align:center;font-size:10px;border-bottom:2px solid #e5e7eb;padding-bottom:5px">CHANGE</th>
             </tr>
             <tr>
@@ -303,6 +305,80 @@ tr:hover td { background:#f9fafb; }
             </tr>
           </thead>
           <tbody id="pageTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<!-- ===== KEYWORD RANK TAB ===== -->
+  <div class="section" id="tab-keywordrank">
+    <div class="kpi-row" id="kwKpiGrid" style="grid-template-columns:repeat(6,1fr)"></div>
+    <div class="chart-row single">
+      <div class="card">
+        <div class="card-title">Biggest Movers (Rank Position Change)</div>
+        <div class="card-sub">Green = improved rank, Red = declined — latest vs prior week</div>
+        <div class="chart-wrap tall"><canvas id="kwMoversBar"></canvas></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="card-title" style="margin-bottom:2px">All Tracked Keywords</div>
+          <div class="card-sub" style="margin-bottom:10px">Sorted by current rank, then by search volume for non-ranking keywords</div>
+        </div>
+        <input type="text" id="kwSearchInput" placeholder="Search keyword or URL…" oninput="filterKeywordTable(this.value)" style="padding:7px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;min-width:220px;outline:none;color:#111827">
+      </div>
+      <div class="tbl-wrap">
+        <table id="kwTable">
+          <thead>
+            <tr>
+              <th style="border-bottom:2px solid #e5e7eb">Keyword</th>
+              <th class="num-r" style="border-bottom:2px solid #e5e7eb">Search Vol.</th>
+              <th style="border-bottom:2px solid #e5e7eb">Target URL</th>
+              <th class="num-r" style="border-bottom:2px solid #e5e7eb">Curr Rank</th>
+              <th class="num-r" style="border-bottom:2px solid #e5e7eb">Prev Rank</th>
+              <th style="border-bottom:2px solid #e5e7eb">Prev Range</th>
+              <th class="num-r" style="border-bottom:2px solid #e5e7eb">Δ Position</th>
+            </tr>
+          </thead>
+          <tbody id="kwTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<!-- ===== RANK BUCKET TAB ===== -->
+  <div class="section" id="tab-rankbucket">
+    <div class="kpi-row" id="rbKpiGrid"></div>
+    <div class="chart-row single">
+      <div class="card">
+        <div class="card-title">Keywords Ranking by Position Bucket</div>
+        <div class="card-sub">Cumulative count of tracked keywords ranking within each position band</div>
+        <div class="chart-wrap tall"><canvas id="rbBucketChart"></canvas></div>
+      </div>
+    </div>
+    <div class="data-table-card">
+      <div class="data-table-title">Rank Bucket Data Table</div>
+      <div class="data-tbl-wrap">
+        <table class="data-tbl">
+          <thead>
+            <tr>
+              <th>Week</th>
+              <th class="num">Top 3</th>
+              <th class="num">Top 3 SV</th>
+              <th class="num">Top 6</th>
+              <th class="num">Top 6 SV</th>
+              <th class="num">Top 10</th>
+              <th class="num">Top 10 SV</th>
+              <th class="num">Top 20</th>
+              <th class="num">Top 20 SV</th>
+              <th class="num">Top 30</th>
+              <th class="num">Top 30 SV</th>
+              <th class="num">Top 100</th>
+              <th class="num">Top 100 SV</th>
+            </tr>
+          </thead>
+          <tbody id="rbTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -343,6 +419,7 @@ const DATA = {
     { week:'19 Oct–25 Oct', totalClicks:3035, totalImp:303683, brandClicks:1353, brandImp:151320, nbClicks:1682, nbImp:152363 },
     { week:'26 Oct–1 Nov', totalClicks:3643, totalImp:298457, brandClicks:1554, brandImp:144563, nbClicks:2089, nbImp:153894 },
     { week:'2 Nov–8 Nov', totalClicks:3329, totalImp:310907, brandClicks:1476, brandImp:148693, nbClicks:1853, nbImp:162214 },
+    { week:'9 Nov–15 Nov', totalClicks:3595, totalImp:340117, brandClicks:1337, brandImp:167264, nbClicks:2258, nbImp:172853 },
   ],
   mom: [
     { month:"Mar'26", totalClicks:14811, totalImp:1255673, brandClicks:7271, brandImp:454238, nbClicks:7540, nbImp:1248402 },
@@ -373,90 +450,571 @@ const DATA = {
     { keyword:'software licence mgmt tool',    sv:170,   category:null,       rank:62,  diff:-33 },
   ],
   pages: [
-    { url:'/', currClicks:885, currImp:127778, prevClicks:814, prevImp:121466, dir:'up', chg:'+8.72%', impChg:'+5.20%' },
-    { url:'/insurance/claims', currClicks:458, currImp:7172, prevClicks:407, prevImp:7182, dir:'up', chg:'+12.53%', impChg:'-0.14%' },
-    { url:'/insurance/pet', currClicks:107, currImp:1201, prevClicks:131, prevImp:1174, dir:'dn', chg:'-18.32%', impChg:'+2.30%' },
-    { url:'/insurance/agents', currClicks:54, currImp:5138, prevClicks:41, prevImp:4996, dir:'up', chg:'+31.71%', impChg:'+2.84%' },
-    { url:'/insurance', currClicks:49, currImp:8755, prevClicks:38, prevImp:8995, dir:'up', chg:'+28.95%', impChg:'-2.67%' },
-    { url:'/the-extra-mile/advice/car/12-month-insurance-policy-benefits', currClicks:10, currImp:1775, prevClicks:13, prevImp:1737, dir:'dn', chg:'-23.08%', impChg:'+2.19%' },
-    { url:'/insurance/business-insurance', currClicks:12, currImp:845, prevClicks:13, prevImp:797, dir:'dn', chg:'-7.69%', impChg:'+6.02%' },
-    { url:'/insurance/armadillo', currClicks:21, currImp:986, prevClicks:16, prevImp:755, dir:'up', chg:'+31.25%', impChg:'+30.60%' },
+    { url:'/', currClicks:779, currImp:128592, prevClicks:885, prevImp:127778, dir:'dn', chg:'-11.98%', impChg:'+0.64%' },
+    { url:'/insurance/claims', currClicks:394, currImp:7228, prevClicks:458, prevImp:7172, dir:'dn', chg:'-13.97%', impChg:'+0.78%' },
+    { url:'/insurance/pet', currClicks:88, currImp:1168, prevClicks:107, prevImp:1201, dir:'dn', chg:'-17.76%', impChg:'-2.75%' },
+    { url:'/insurance/agents', currClicks:46, currImp:7266, prevClicks:54, prevImp:5138, dir:'dn', chg:'-14.81%', impChg:'+41.42%' },
+    { url:'/insurance', currClicks:45, currImp:9747, prevClicks:49, prevImp:8755, dir:'dn', chg:'-8.16%', impChg:'+11.33%' },
+    { url:'/the-extra-mile/advice/car/12-month-insurance-policy-benefits', currClicks:11, currImp:1754, prevClicks:10, prevImp:1775, dir:'up', chg:'+10.00%', impChg:'-1.18%' },
+    { url:'/insurance/business-insurance', currClicks:9, currImp:908, prevClicks:12, prevImp:845, dir:'dn', chg:'-25.00%', impChg:'+7.46%' },
+    { url:'/insurance/armadillo', currClicks:9, currImp:856, prevClicks:21, prevImp:986, dir:'dn', chg:'-57.14%', impChg:'-13.18%' },
     { url:'/the-extra-mile/prepare/budget/how-much-does-car-insurance-increase-after-accident', currClicks:0, currImp:0, prevClicks:0, prevImp:0, dir:'nt', chg:'N/A', impChg:'N/A' },
-    { url:'/insurance/wedding-insurance', currClicks:5, currImp:508, prevClicks:11, prevImp:258, dir:'dn', chg:'-54.55%', impChg:'+96.90%' },
-    { url:'/the-extra-mile/advice/budget/do-you-need-insurance-to-drive-someone-elses-car', currClicks:2, currImp:587, prevClicks:4, prevImp:588, dir:'dn', chg:'-50.00%', impChg:'-0.17%' },
-    { url:'/the-extra-mile/advice/budget/homeowners-insurance-for-renovations', currClicks:12, currImp:2417, prevClicks:16, prevImp:2338, dir:'dn', chg:'-25.00%', impChg:'+3.38%' },
-    { url:'/insurance/car', currClicks:7, currImp:4858, prevClicks:17, prevImp:3822, dir:'dn', chg:'-58.82%', impChg:'+27.11%' },
-    { url:'/insurance/mypolicywhat', currClicks:15, currImp:4013, prevClicks:17, prevImp:4167, dir:'dn', chg:'-11.76%', impChg:'-3.70%' },
-    { url:'/the-extra-mile/advice/insurance/adding-teens-to-your-car-insurance', currClicks:9, currImp:3056, prevClicks:17, prevImp:3482, dir:'dn', chg:'-47.06%', impChg:'-12.23%' },
-    { url:'/insurance/homeowners-insurance', currClicks:11, currImp:4581, prevClicks:17, prevImp:3708, dir:'dn', chg:'-35.29%', impChg:'+23.54%' },
-    { url:'/the-extra-mile/series/the-extra-mile-magazine/what-homeowners-insurance-does-not-cover', currClicks:1, currImp:481, prevClicks:5, prevImp:598, dir:'dn', chg:'-80.00%', impChg:'-19.57%' },
-    { url:'/insurance/askanagent/auto4-insurance-rental', currClicks:2, currImp:414, prevClicks:0, prevImp:690, dir:'up', chg:'N/A', impChg:'-40.00%' },
-    { url:'/the-extra-mile/advice/budget/personal-property-insurance-for-your-valuables', currClicks:5, currImp:1026, prevClicks:5, prevImp:1156, dir:'nt', chg:'+0.00%', impChg:'-11.25%' },
-    { url:'/the-extra-mile/advice/car/the-most-and-least-expensive-car-brands-to-insure', currClicks:0, currImp:56, prevClicks:1, prevImp:899, dir:'dn', chg:'-100.00%', impChg:'-93.77%' },
-    { url:'/the-extra-mile/advice/insurance/how-to-lower-your-car-insurance', currClicks:4, currImp:784, prevClicks:9, prevImp:737, dir:'dn', chg:'-55.56%', impChg:'+6.38%' },
-    { url:'/insurance/specialty-lines', currClicks:4, currImp:420, prevClicks:7, prevImp:548, dir:'dn', chg:'-42.86%', impChg:'-23.36%' },
-    { url:'/insurance/umbrella', currClicks:2, currImp:324, prevClicks:2, prevImp:370, dir:'nt', chg:'+0.00%', impChg:'-12.43%' },
-    { url:'/insurance/accident-checklist', currClicks:5, currImp:154, prevClicks:4, prevImp:179, dir:'up', chg:'+25.00%', impChg:'-13.97%' },
-    { url:'/the-extra-mile/advice/car/hidden-dangers-of-floodwater', currClicks:19, currImp:2395, prevClicks:4, prevImp:1139, dir:'up', chg:'+375.00%', impChg:'+110.27%' },
-    { url:'/insurance/renters', currClicks:3, currImp:1472, prevClicks:3, prevImp:1548, dir:'nt', chg:'+0.00%', impChg:'-4.91%' },
-    { url:'/the-extra-mile/advice/travel/travel-insurance-tips-every-traveler-should-know', currClicks:0, currImp:1986, prevClicks:3, prevImp:3255, dir:'dn', chg:'-100.00%', impChg:'-38.99%' },
-    { url:'/the-extra-mile/series/the-extra-mile-magazine/what-drives-auto-insurance-rate-increases', currClicks:1, currImp:189, prevClicks:0, prevImp:218, dir:'up', chg:'N/A', impChg:'-13.30%' },
-    { url:'/the-extra-mile/advice/budget/what-is-gap-insurance', currClicks:1, currImp:506, prevClicks:2, prevImp:503, dir:'dn', chg:'-50.00%', impChg:'+0.60%' },
-    { url:'/the-extra-mile/advice/budget/how-your-insurance-premiums-are-calculated', currClicks:4, currImp:2863, prevClicks:7, prevImp:3485, dir:'dn', chg:'-42.86%', impChg:'-17.85%' },
-    { url:'/the-extra-mile/advice/insurance/usage-based-insurance', currClicks:2, currImp:615, prevClicks:2, prevImp:681, dir:'nt', chg:'+0.00%', impChg:'-9.69%' },
-    { url:'/the-extra-mile/advice/budget/the-benefits-of-business-insurance', currClicks:3, currImp:257, prevClicks:6, prevImp:220, dir:'dn', chg:'-50.00%', impChg:'+16.82%' },
-    { url:'/the-extra-mile/advice/travel/9-things-to-know-before-you-purchase-trip-insurance', currClicks:2, currImp:2662, prevClicks:1, prevImp:581, dir:'up', chg:'+100.00%', impChg:'+358.18%' },
-    { url:'/the-extra-mile/advice/budget/what-is-full-coverage-car-insurance', currClicks:9, currImp:8802, prevClicks:13, prevImp:9009, dir:'dn', chg:'-30.77%', impChg:'-2.30%' },
+    { url:'/insurance/wedding-insurance', currClicks:10, currImp:733, prevClicks:5, prevImp:508, dir:'up', chg:'+100.00%', impChg:'+44.29%' },
+    { url:'/the-extra-mile/advice/budget/do-you-need-insurance-to-drive-someone-elses-car', currClicks:1, currImp:650, prevClicks:2, prevImp:587, dir:'dn', chg:'-50.00%', impChg:'+10.73%' },
+    { url:'/the-extra-mile/advice/budget/homeowners-insurance-for-renovations', currClicks:9, currImp:2639, prevClicks:12, prevImp:2417, dir:'dn', chg:'-25.00%', impChg:'+9.18%' },
+    { url:'/insurance/car', currClicks:15, currImp:3940, prevClicks:7, prevImp:4858, dir:'up', chg:'+114.29%', impChg:'-18.90%' },
+    { url:'/insurance/mypolicywhat', currClicks:16, currImp:3754, prevClicks:15, prevImp:4013, dir:'up', chg:'+6.67%', impChg:'-6.45%' },
+    { url:'/the-extra-mile/advice/insurance/adding-teens-to-your-car-insurance', currClicks:17, currImp:2839, prevClicks:9, prevImp:3056, dir:'up', chg:'+88.89%', impChg:'-7.10%' },
+    { url:'/insurance/homeowners-insurance', currClicks:19, currImp:6128, prevClicks:11, prevImp:4581, dir:'up', chg:'+72.73%', impChg:'+33.77%' },
+    { url:'/the-extra-mile/series/the-extra-mile-magazine/what-homeowners-insurance-does-not-cover', currClicks:1, currImp:612, prevClicks:1, prevImp:481, dir:'nt', chg:'+0.00%', impChg:'+27.23%' },
+    { url:'/insurance/askanagent/auto4-insurance-rental', currClicks:0, currImp:351, prevClicks:2, prevImp:414, dir:'dn', chg:'-100.00%', impChg:'-15.22%' },
+    { url:'/the-extra-mile/advice/budget/personal-property-insurance-for-your-valuables', currClicks:2, currImp:1109, prevClicks:5, prevImp:1026, dir:'dn', chg:'-60.00%', impChg:'+8.09%' },
+    { url:'/the-extra-mile/advice/car/the-most-and-least-expensive-car-brands-to-insure', currClicks:0, currImp:0, prevClicks:0, prevImp:56, dir:'nt', chg:'N/A', impChg:'-100.00%' },
+    { url:'/the-extra-mile/advice/insurance/how-to-lower-your-car-insurance', currClicks:6, currImp:941, prevClicks:4, prevImp:784, dir:'up', chg:'+50.00%', impChg:'+20.03%' },
+    { url:'/insurance/specialty-lines', currClicks:8, currImp:598, prevClicks:4, prevImp:420, dir:'up', chg:'+100.00%', impChg:'+42.38%' },
+    { url:'/insurance/umbrella', currClicks:4, currImp:375, prevClicks:2, prevImp:324, dir:'up', chg:'+100.00%', impChg:'+15.74%' },
+    { url:'/insurance/accident-checklist', currClicks:4, currImp:157, prevClicks:5, prevImp:154, dir:'dn', chg:'-20.00%', impChg:'+1.95%' },
+    { url:'/the-extra-mile/advice/car/hidden-dangers-of-floodwater', currClicks:6, currImp:849, prevClicks:19, prevImp:2395, dir:'dn', chg:'-68.42%', impChg:'-64.55%' },
+    { url:'/insurance/renters', currClicks:3, currImp:1109, prevClicks:3, prevImp:1472, dir:'nt', chg:'+0.00%', impChg:'-24.66%' },
+    { url:'/the-extra-mile/advice/travel/travel-insurance-tips-every-traveler-should-know', currClicks:2, currImp:3976, prevClicks:0, prevImp:1986, dir:'up', chg:'N/A', impChg:'+100.20%' },
+    { url:'/the-extra-mile/series/the-extra-mile-magazine/what-drives-auto-insurance-rate-increases', currClicks:0, currImp:180, prevClicks:1, prevImp:189, dir:'dn', chg:'-100.00%', impChg:'-4.76%' },
+    { url:'/the-extra-mile/advice/budget/what-is-gap-insurance', currClicks:0, currImp:538, prevClicks:1, prevImp:506, dir:'dn', chg:'-100.00%', impChg:'+6.32%' },
+    { url:'/the-extra-mile/advice/budget/how-your-insurance-premiums-are-calculated', currClicks:4, currImp:2946, prevClicks:4, prevImp:2863, dir:'nt', chg:'+0.00%', impChg:'+2.90%' },
+    { url:'/the-extra-mile/advice/insurance/usage-based-insurance', currClicks:2, currImp:578, prevClicks:2, prevImp:615, dir:'nt', chg:'+0.00%', impChg:'-6.02%' },
+    { url:'/the-extra-mile/advice/budget/the-benefits-of-business-insurance', currClicks:1, currImp:229, prevClicks:3, prevImp:257, dir:'dn', chg:'-66.67%', impChg:'-10.89%' },
+    { url:'/the-extra-mile/advice/travel/9-things-to-know-before-you-purchase-trip-insurance', currClicks:1, currImp:582, prevClicks:2, prevImp:2662, dir:'dn', chg:'-50.00%', impChg:'-78.14%' },
+    { url:'/the-extra-mile/advice/budget/what-is-full-coverage-car-insurance', currClicks:17, currImp:8981, prevClicks:9, prevImp:8802, dir:'up', chg:'+88.89%', impChg:'+2.03%' },
     { url:'/the-extra-mile/prepare/budget/what-is-an-umbrella-policy', currClicks:0, currImp:0, prevClicks:0, prevImp:0, dir:'nt', chg:'N/A', impChg:'N/A' },
-    { url:'/the-extra-mile/advice/home/what-homeowners-insurance-actually-covers', currClicks:1, currImp:562, prevClicks:0, prevImp:671, dir:'up', chg:'N/A', impChg:'-16.24%' },
-    { url:'/the-extra-mile/advice/budget/does-bundling-insurance-really-save-you-money', currClicks:0, currImp:44, prevClicks:0, prevImp:47, dir:'nt', chg:'N/A', impChg:'-6.38%' },
-    { url:'/the-extra-mile/series/the-extra-mile-magazine/insuring-your-home-against-a-water-backup', currClicks:0, currImp:71, prevClicks:0, prevImp:81, dir:'nt', chg:'N/A', impChg:'-12.35%' },
-    { url:'/the-extra-mile/series/the-extra-mile-magazine/what-to-do-after-a-car-accident', currClicks:2, currImp:773, prevClicks:1, prevImp:909, dir:'up', chg:'+100.00%', impChg:'-14.96%' },
-    { url:'/the-extra-mile/series/the-extra-mile-magazine/protecting-yourself-against-uninsured-drivers', currClicks:0, currImp:74, prevClicks:0, prevImp:81, dir:'nt', chg:'N/A', impChg:'-8.64%' },
-    { url:'/the-extra-mile/advice/life/insurance-you-need-in-every-stage-of-life', currClicks:1, currImp:125, prevClicks:0, prevImp:106, dir:'up', chg:'N/A', impChg:'+17.92%' },
-    { url:'/the-extra-mile/advice/car/is-rental-car-insurance-necessary', currClicks:0, currImp:58, prevClicks:0, prevImp:108, dir:'nt', chg:'N/A', impChg:'-46.30%' },
-    { url:'/the-extra-mile/advice/car/when-does-car-insurance-cover-repairs', currClicks:0, currImp:133, prevClicks:0, prevImp:123, dir:'nt', chg:'N/A', impChg:'+8.13%' },
-    { url:'/the-extra-mile/advice/budget/what-does-it-mean-if-a-car-is-totaled', currClicks:1, currImp:275, prevClicks:0, prevImp:308, dir:'up', chg:'N/A', impChg:'-10.71%' },
-    { url:'/insurance/home-inventory', currClicks:0, currImp:50, prevClicks:3, prevImp:65, dir:'dn', chg:'-100.00%', impChg:'-23.08%' },
-    { url:'/insurance/life', currClicks:0, currImp:733, prevClicks:0, prevImp:535, dir:'nt', chg:'N/A', impChg:'+37.01%' },
-    { url:'/insurance/askanagent/auto1-insurance-questions', currClicks:3, currImp:502, prevClicks:2, prevImp:475, dir:'up', chg:'+50.00%', impChg:'+5.68%' },
-    { url:'/the-extra-mile/advice/life/is-pet-insurance-worth-it', currClicks:0, currImp:312, prevClicks:0, prevImp:199, dir:'nt', chg:'N/A', impChg:'+56.78%' },
-    { url:'/the-extra-mile/advice/life/how-extreme-weather-is-impacting-your-home-insurance-costs', currClicks:0, currImp:34, prevClicks:0, prevImp:60, dir:'nt', chg:'N/A', impChg:'-43.33%' },
-    { url:'/the-extra-mile/advice/home/when-do-you-need-mortgage-insurance', currClicks:0, currImp:303, prevClicks:2, prevImp:397, dir:'dn', chg:'-100.00%', impChg:'-23.68%' },
-    { url:'/the-extra-mile/advice/budget/flood-insurance-faq', currClicks:4, currImp:215, prevClicks:2, prevImp:165, dir:'up', chg:'+100.00%', impChg:'+30.30%' },
-    { url:'/insurance/askanagent/savings2-insurance-safest-cars', currClicks:0, currImp:12, prevClicks:0, prevImp:13, dir:'nt', chg:'N/A', impChg:'-7.69%' },
-    { url:'/insurance/insurance-life-rfq', currClicks:2, currImp:15, prevClicks:0, prevImp:10, dir:'up', chg:'N/A', impChg:'+50.00%' },
-    { url:'/insurance/askanagent', currClicks:0, currImp:39, prevClicks:0, prevImp:46, dir:'nt', chg:'N/A', impChg:'-15.22%' },
-    { url:'/the-extra-mile/advice/car/motorcycle-insurance-myths', currClicks:0, currImp:85, prevClicks:0, prevImp:107, dir:'nt', chg:'N/A', impChg:'-20.56%' },
-    { url:'/the-extra-mile/advice/budget/are-you-overpaying-for-insurance', currClicks:0, currImp:186, prevClicks:0, prevImp:151, dir:'nt', chg:'N/A', impChg:'+23.18%' },
-    { url:'/the-extra-mile/advice/budget/what-is-liability-insurance', currClicks:0, currImp:566, prevClicks:0, prevImp:314, dir:'nt', chg:'N/A', impChg:'+80.25%' },
-    { url:'/the-extra-mile/advice/travel/what-does-cruise-insurance-cover', currClicks:0, currImp:352, prevClicks:2, prevImp:460, dir:'dn', chg:'-100.00%', impChg:'-23.48%' },
-    { url:'/the-extra-mile/advice/life/6-key-benefits-of-life-insurance-everyone-should-know', currClicks:0, currImp:885, prevClicks:0, prevImp:1047, dir:'nt', chg:'N/A', impChg:'-15.47%' },
-    { url:'/insurance/askanagent/savings1-insurance-joining-lives', currClicks:1, currImp:109, prevClicks:0, prevImp:108, dir:'up', chg:'N/A', impChg:'+0.93%' },
+    { url:'/the-extra-mile/advice/home/what-homeowners-insurance-actually-covers', currClicks:0, currImp:646, prevClicks:1, prevImp:562, dir:'dn', chg:'-100.00%', impChg:'+14.95%' },
+    { url:'/the-extra-mile/advice/budget/does-bundling-insurance-really-save-you-money', currClicks:0, currImp:343, prevClicks:0, prevImp:44, dir:'nt', chg:'N/A', impChg:'+679.55%' },
+    { url:'/the-extra-mile/series/the-extra-mile-magazine/insuring-your-home-against-a-water-backup', currClicks:1, currImp:81, prevClicks:0, prevImp:71, dir:'up', chg:'N/A', impChg:'+14.08%' },
+    { url:'/the-extra-mile/series/the-extra-mile-magazine/what-to-do-after-a-car-accident', currClicks:2, currImp:1261, prevClicks:2, prevImp:773, dir:'nt', chg:'+0.00%', impChg:'+63.13%' },
+    { url:'/the-extra-mile/series/the-extra-mile-magazine/protecting-yourself-against-uninsured-drivers', currClicks:0, currImp:91, prevClicks:0, prevImp:74, dir:'nt', chg:'N/A', impChg:'+22.97%' },
+    { url:'/the-extra-mile/advice/life/insurance-you-need-in-every-stage-of-life', currClicks:1, currImp:137, prevClicks:1, prevImp:125, dir:'nt', chg:'+0.00%', impChg:'+9.60%' },
+    { url:'/the-extra-mile/advice/car/is-rental-car-insurance-necessary', currClicks:1, currImp:124, prevClicks:0, prevImp:58, dir:'up', chg:'N/A', impChg:'+113.79%' },
+    { url:'/the-extra-mile/advice/car/when-does-car-insurance-cover-repairs', currClicks:1, currImp:119, prevClicks:0, prevImp:133, dir:'up', chg:'N/A', impChg:'-10.53%' },
+    { url:'/the-extra-mile/advice/budget/what-does-it-mean-if-a-car-is-totaled', currClicks:0, currImp:332, prevClicks:1, prevImp:275, dir:'dn', chg:'-100.00%', impChg:'+20.73%' },
+    { url:'/insurance/home-inventory', currClicks:0, currImp:46, prevClicks:0, prevImp:50, dir:'nt', chg:'N/A', impChg:'-8.00%' },
+    { url:'/insurance/life', currClicks:0, currImp:681, prevClicks:0, prevImp:733, dir:'nt', chg:'N/A', impChg:'-7.09%' },
+    { url:'/insurance/askanagent/auto1-insurance-questions', currClicks:0, currImp:510, prevClicks:3, prevImp:502, dir:'dn', chg:'-100.00%', impChg:'+1.59%' },
+    { url:'/the-extra-mile/advice/life/is-pet-insurance-worth-it', currClicks:0, currImp:373, prevClicks:0, prevImp:312, dir:'nt', chg:'N/A', impChg:'+19.55%' },
+    { url:'/the-extra-mile/advice/life/how-extreme-weather-is-impacting-your-home-insurance-costs', currClicks:0, currImp:54, prevClicks:0, prevImp:34, dir:'nt', chg:'N/A', impChg:'+58.82%' },
+    { url:'/the-extra-mile/advice/home/when-do-you-need-mortgage-insurance', currClicks:0, currImp:354, prevClicks:0, prevImp:303, dir:'nt', chg:'N/A', impChg:'+16.83%' },
+    { url:'/the-extra-mile/advice/budget/flood-insurance-faq', currClicks:2, currImp:197, prevClicks:4, prevImp:215, dir:'dn', chg:'-50.00%', impChg:'-8.37%' },
+    { url:'/insurance/askanagent/savings2-insurance-safest-cars', currClicks:0, currImp:3, prevClicks:0, prevImp:12, dir:'nt', chg:'N/A', impChg:'-75.00%' },
+    { url:'/insurance/insurance-life-rfq', currClicks:0, currImp:14, prevClicks:2, prevImp:15, dir:'dn', chg:'-100.00%', impChg:'-6.67%' },
+    { url:'/insurance/askanagent', currClicks:3, currImp:42, prevClicks:0, prevImp:39, dir:'up', chg:'N/A', impChg:'+7.69%' },
+    { url:'/the-extra-mile/advice/car/motorcycle-insurance-myths', currClicks:0, currImp:124, prevClicks:0, prevImp:85, dir:'nt', chg:'N/A', impChg:'+45.88%' },
+    { url:'/the-extra-mile/advice/budget/are-you-overpaying-for-insurance', currClicks:0, currImp:151, prevClicks:0, prevImp:186, dir:'nt', chg:'N/A', impChg:'-18.82%' },
+    { url:'/the-extra-mile/advice/budget/what-is-liability-insurance', currClicks:0, currImp:703, prevClicks:0, prevImp:566, dir:'nt', chg:'N/A', impChg:'+24.20%' },
+    { url:'/the-extra-mile/advice/travel/what-does-cruise-insurance-cover', currClicks:0, currImp:634, prevClicks:0, prevImp:352, dir:'nt', chg:'N/A', impChg:'+80.11%' },
+    { url:'/the-extra-mile/advice/life/6-key-benefits-of-life-insurance-everyone-should-know', currClicks:0, currImp:875, prevClicks:0, prevImp:885, dir:'nt', chg:'N/A', impChg:'-1.13%' },
+    { url:'/insurance/askanagent/savings1-insurance-joining-lives', currClicks:0, currImp:101, prevClicks:1, prevImp:109, dir:'dn', chg:'-100.00%', impChg:'-7.34%' },
     { url:'/the-extra-mile/prepare/budget/do-i-need-flood-insurance', currClicks:0, currImp:0, prevClicks:0, prevImp:0, dir:'nt', chg:'N/A', impChg:'N/A' },
-    { url:'/the-extra-mile/advice/insurance/how-to-choose-the-best-car-insurance-for-you', currClicks:0, currImp:76, prevClicks:0, prevImp:85, dir:'nt', chg:'N/A', impChg:'-10.59%' },
-    { url:'/the-extra-mile/advice/life/understanding-life-insurance', currClicks:0, currImp:633, prevClicks:0, prevImp:670, dir:'nt', chg:'N/A', impChg:'-5.52%' },
-    { url:'/insurance/other', currClicks:1, currImp:140, prevClicks:0, prevImp:100, dir:'up', chg:'N/A', impChg:'+40.00%' },
-    { url:'/insurance/askanagent/savings3-insurance-home-security', currClicks:0, currImp:19, prevClicks:0, prevImp:15, dir:'nt', chg:'N/A', impChg:'+26.67%' },
-    { url:'/insurance/askanagent/auto3-insurance-new-car-price', currClicks:0, currImp:16, prevClicks:0, prevImp:20, dir:'nt', chg:'N/A', impChg:'-20.00%' },
-    { url:'/the-extra-mile/advice/travel/how-travel-insurance-saved-my-trip', currClicks:0, currImp:6, prevClicks:0, prevImp:7, dir:'nt', chg:'N/A', impChg:'-14.29%' },
-    { url:'/the-extra-mile/advice/budget/6-ways-to-get-the-best-insurance-rates', currClicks:2, currImp:37, prevClicks:0, prevImp:26, dir:'up', chg:'N/A', impChg:'+42.31%' },
-    { url:'/the-extra-mile/series/the-extra-mile-magazine/avoid-buying-a-flood-damaged-vehicle', currClicks:0, currImp:11, prevClicks:0, prevImp:10, dir:'nt', chg:'N/A', impChg:'+10.00%' },
-    { url:'/the-extra-mile/advice/home/common-myths-about-renters-insurance', currClicks:0, currImp:84, prevClicks:1, prevImp:105, dir:'dn', chg:'-100.00%', impChg:'-20.00%' },
-    { url:'/the-extra-mile/advice/home/prevent-water-damage-from-flooded-basement', currClicks:0, currImp:298, prevClicks:0, prevImp:281, dir:'nt', chg:'N/A', impChg:'+6.05%' },
-    { url:'/insurance/universal-rfq', currClicks:0, currImp:61, prevClicks:0, prevImp:54, dir:'nt', chg:'N/A', impChg:'+12.96%' },
-    { url:'/insurance/askanagent/life-insurance-checklist', currClicks:0, currImp:72, prevClicks:0, prevImp:29, dir:'nt', chg:'N/A', impChg:'+148.28%' },
-    { url:'/the-extra-mile/advice/budget/5-things-your-insurance-agent-wishes-you-knew', currClicks:0, currImp:12, prevClicks:0, prevImp:8, dir:'nt', chg:'N/A', impChg:'+50.00%' },
-    { url:'/the-extra-mile/advice/budget/five-insurance-terms-you-should-know', currClicks:1, currImp:5, prevClicks:0, prevImp:8, dir:'up', chg:'N/A', impChg:'-37.50%' },
-    { url:'/insurance/askanagent/home3-insurance-away-security', currClicks:0, currImp:1, prevClicks:0, prevImp:2, dir:'nt', chg:'N/A', impChg:'-50.00%' },
-    { url:'/insurance/askanagent/home4-insurance-contractor-diy', currClicks:0, currImp:1, prevClicks:0, prevImp:3, dir:'nt', chg:'N/A', impChg:'-66.67%' },
-    { url:'/insurance/askanagent/home1-insurance-renters-myths', currClicks:0, currImp:55, prevClicks:0, prevImp:78, dir:'nt', chg:'N/A', impChg:'-29.49%' },
-    { url:'/insurance/askanagent/home2-insurance-tips-for-buyers', currClicks:0, currImp:528, prevClicks:0, prevImp:329, dir:'nt', chg:'N/A', impChg:'+60.49%' },
-    { url:'/the-extra-mile/advice/budget/do-you-know-at-what-age-you-should-really-buy-life-insurance', currClicks:0, currImp:51, prevClicks:0, prevImp:52, dir:'nt', chg:'N/A', impChg:'-1.92%' },
+    { url:'/the-extra-mile/advice/insurance/how-to-choose-the-best-car-insurance-for-you', currClicks:0, currImp:99, prevClicks:0, prevImp:76, dir:'nt', chg:'N/A', impChg:'+30.26%' },
+    { url:'/the-extra-mile/advice/life/understanding-life-insurance', currClicks:0, currImp:495, prevClicks:0, prevImp:633, dir:'nt', chg:'N/A', impChg:'-21.80%' },
+    { url:'/insurance/other', currClicks:2, currImp:150, prevClicks:1, prevImp:140, dir:'up', chg:'+100.00%', impChg:'+7.14%' },
+    { url:'/insurance/askanagent/savings3-insurance-home-security', currClicks:0, currImp:22, prevClicks:0, prevImp:19, dir:'nt', chg:'N/A', impChg:'+15.79%' },
+    { url:'/insurance/askanagent/auto3-insurance-new-car-price', currClicks:0, currImp:28, prevClicks:0, prevImp:16, dir:'nt', chg:'N/A', impChg:'+75.00%' },
+    { url:'/the-extra-mile/advice/travel/how-travel-insurance-saved-my-trip', currClicks:1, currImp:11, prevClicks:0, prevImp:6, dir:'up', chg:'N/A', impChg:'+83.33%' },
+    { url:'/the-extra-mile/advice/budget/6-ways-to-get-the-best-insurance-rates', currClicks:1, currImp:99, prevClicks:2, prevImp:37, dir:'dn', chg:'-50.00%', impChg:'+167.57%' },
+    { url:'/the-extra-mile/series/the-extra-mile-magazine/avoid-buying-a-flood-damaged-vehicle', currClicks:0, currImp:6, prevClicks:0, prevImp:11, dir:'nt', chg:'N/A', impChg:'-45.45%' },
+    { url:'/the-extra-mile/advice/home/common-myths-about-renters-insurance', currClicks:0, currImp:71, prevClicks:0, prevImp:84, dir:'nt', chg:'N/A', impChg:'-15.48%' },
+    { url:'/the-extra-mile/advice/home/prevent-water-damage-from-flooded-basement', currClicks:0, currImp:312, prevClicks:0, prevImp:298, dir:'nt', chg:'N/A', impChg:'+4.70%' },
+    { url:'/insurance/universal-rfq', currClicks:0, currImp:50, prevClicks:0, prevImp:61, dir:'nt', chg:'N/A', impChg:'-18.03%' },
+    { url:'/insurance/askanagent/life-insurance-checklist', currClicks:0, currImp:82, prevClicks:0, prevImp:72, dir:'nt', chg:'N/A', impChg:'+13.89%' },
+    { url:'/the-extra-mile/advice/budget/5-things-your-insurance-agent-wishes-you-knew', currClicks:0, currImp:12, prevClicks:0, prevImp:12, dir:'nt', chg:'N/A', impChg:'+0.00%' },
+    { url:'/the-extra-mile/advice/budget/five-insurance-terms-you-should-know', currClicks:0, currImp:11, prevClicks:1, prevImp:5, dir:'dn', chg:'-100.00%', impChg:'+120.00%' },
+    { url:'/insurance/askanagent/home3-insurance-away-security', currClicks:0, currImp:0, prevClicks:0, prevImp:1, dir:'nt', chg:'N/A', impChg:'-100.00%' },
+    { url:'/insurance/askanagent/home4-insurance-contractor-diy', currClicks:0, currImp:2, prevClicks:0, prevImp:1, dir:'nt', chg:'N/A', impChg:'+100.00%' },
+    { url:'/insurance/askanagent/home1-insurance-renters-myths', currClicks:1, currImp:97, prevClicks:0, prevImp:55, dir:'up', chg:'N/A', impChg:'+76.36%' },
+    { url:'/insurance/askanagent/home2-insurance-tips-for-buyers', currClicks:0, currImp:632, prevClicks:0, prevImp:528, dir:'nt', chg:'N/A', impChg:'+19.70%' },
+    { url:'/the-extra-mile/advice/budget/do-you-know-at-what-age-you-should-really-buy-life-insurance', currClicks:0, currImp:55, prevClicks:0, prevImp:51, dir:'nt', chg:'N/A', impChg:'+7.84%' },
     { url:'/the-extra-mile/advice/insurance/a-beginners-guide-to-car-insurance', currClicks:0, currImp:0, prevClicks:0, prevImp:0, dir:'nt', chg:'N/A', impChg:'N/A' },
-    { url:'/the-extra-mile/advice/Insurance', currClicks:0, currImp:40, prevClicks:0, prevImp:38, dir:'nt', chg:'N/A', impChg:'+5.26%' },
-    { url:'/the-extra-mile/series/the-extra-mile-magazine/protections-provided-by-life-insurance-and-annuities', currClicks:0, currImp:138, prevClicks:0, prevImp:173, dir:'nt', chg:'N/A', impChg:'-20.23%' },
+    { url:'/the-extra-mile/advice/Insurance', currClicks:0, currImp:42, prevClicks:0, prevImp:40, dir:'nt', chg:'N/A', impChg:'+5.00%' },
+    { url:'/the-extra-mile/series/the-extra-mile-magazine/protections-provided-by-life-insurance-and-annuities', currClicks:0, currImp:167, prevClicks:0, prevImp:138, dir:'nt', chg:'N/A', impChg:'+21.01%' },
     { url:'/insurance/askanagent/savings6-insurance-getting-finances-in-order', currClicks:0, currImp:0, prevClicks:0, prevImp:0, dir:'nt', chg:'N/A', impChg:'N/A' }
+  ]
+  ,
+  keywordRank: [
+    { kw:'does texting while driving affect insurance', sv:50, url:'/the-extra-mile/advice/car/texting-while-driving-hidden-insurance', currRank:1, currRange:'1-3', prevRank:1, prevRange:'1-3', diff:0 },
+    { kw:'aaa membership vs insurance', sv:50, url:'/the-extra-mile/series/why-aaa/membership-vs-insurance', currRank:1, currRange:'1-3', prevRank:7, prevRange:'07-10', diff:-6 },
+    { kw:'does aaa cover rentals', sv:10, url:'/travel/car-rentals', currRank:1, currRange:'1-3', prevRank:5, prevRange:'4-6', diff:-4 },
+    { kw:'6 month vs 12 month auto insurance', sv:50, url:'/the-extra-mile/advice/car/12-month-insurance-policy-benefits', currRank:2, currRange:'1-3', prevRank:3, prevRange:'1-3', diff:-1 },
+    { kw:'auto insurance comprehensive and collision', sv:10, url:'/the-extra-mile/advice/budget/comprehensive-and-collision-insurance-whats-the-difference', currRank:2, currRange:'1-3', prevRank:2, prevRange:'1-3', diff:0 },
+    { kw:'rent a car while car is being repaired', sv:70, url:'/the-extra-mile/advice/insurance/will-insurance-pay-for-a-rental-car-during-repairs', currRank:2, currRange:'1-3', prevRank:null, prevRange:'Not Ranking', diff:2 },
+    { kw:'homeowners insurance for renovations', sv:170, url:'/the-extra-mile/advice/budget/homeowners-insurance-for-renovations', currRank:3, currRange:'1-3', prevRank:3, prevRange:'1-3', diff:0 },
+    { kw:'12-month auto insurance policy', sv:720, url:'/the-extra-mile/advice/car/12-month-insurance-policy-benefits', currRank:3, currRange:'1-3', prevRank:1, prevRange:'1-3', diff:2 },
+    { kw:'short term car insurance', sv:1600, url:'/the-extra-mile/advice/insurance/temporary-car-insurance', currRank:3, currRange:'1-3', prevRank:null, prevRange:'Not Ranking', diff:3 },
+    { kw:'12 month car insurance policy', sv:10, url:'/the-extra-mile/advice/car/12-month-insurance-policy-benefits', currRank:4, currRange:'4-6', prevRank:4, prevRange:'4-6', diff:0 },
+    { kw:'how much will my insurance go up after an accident', sv:30, url:'/the-extra-mile/advice/budget/how-much-does-car-insurance-increase-after-accident', currRank:4, currRange:'4-6', prevRank:11, prevRange:'11-20', diff:-7 },
+    { kw:'temporary car insurance', sv:10800, url:'/the-extra-mile/advice/insurance/temporary-car-insurance', currRank:4, currRange:'4-6', prevRank:4, prevRange:'4-6', diff:0 },
+    { kw:'comprehensive and collision', sv:920, url:'/the-extra-mile/advice/budget/comprehensive-and-collision-insurance-whats-the-difference', currRank:4, currRange:'4-6', prevRank:9, prevRange:'07-10', diff:-5 },
+    { kw:'loan lease gap coverage', sv:170, url:'/the-extra-mile/advice/budget/what-is-gap-insurance', currRank:4, currRange:'4-6', prevRank:5, prevRange:'4-6', diff:-1 },
+    { kw:'will insurance cover a stolen car', sv:2400, url:'/the-extra-mile/advice/car/will-your-insurance-really-cover-a-stolen-car', currRank:5, currRange:'4-6', prevRank:6, prevRange:'4-6', diff:-1 },
+    { kw:'do you need full coverage on a financed car', sv:20, url:'/the-extra-mile/advice/budget/what-is-full-coverage-car-insurance', currRank:5, currRange:'4-6', prevRank:5, prevRange:'4-6', diff:0 },
+    { kw:'car insurance after dui', sv:390, url:'/the-extra-mile/advice/insurance/dui-car-insurance', currRank:5, currRange:'4-6', prevRank:null, prevRange:'Not Ranking', diff:5 },
+    { kw:'does full coverage cover theft', sv:480, url:'/the-extra-mile/advice/car/will-your-insurance-really-cover-a-stolen-car', currRank:5, currRange:'4-6', prevRank:37, prevRange:'31-100', diff:-32 },
+    { kw:'does full coverage cover theft', sv:480, url:'/the-extra-mile/advice/car/will-your-insurance-really-cover-a-stolen-car', currRank:5, currRange:'4-6', prevRank:37, prevRange:'31-100', diff:-32 },
+    { kw:'does car insurance cover a stolen car', sv:10, url:'/the-extra-mile/advice/car/will-your-insurance-really-cover-a-stolen-car', currRank:6, currRange:'4-6', prevRank:34, prevRange:'31-100', diff:-28 },
+    { kw:'non owner car insurance', sv:33100, url:'/the-extra-mile/advice/insurance/non-owner-car-insurance', currRank:6, currRange:'4-6', prevRank:null, prevRange:'Not Ranking', diff:6 },
+    { kw:'non-owner car insurance', sv:20100, url:'/the-extra-mile/advice/insurance/non-owner-car-insurance', currRank:6, currRange:'4-6', prevRank:null, prevRange:'Not Ranking', diff:6 },
+    { kw:'what is subrogation in insurance', sv:50, url:'/the-extra-mile/advice/budget/what-is-subrogation-in-an-insurance-claim', currRank:6, currRange:'4-6', prevRank:6, prevRange:'4-6', diff:0 },
+    { kw:'aaa rental car insurance', sv:10, url:'/the-extra-mile/advice/car/is-rental-car-insurance-necessary', currRank:7, currRange:'07-10', prevRank:11, prevRange:'11-20', diff:-4 },
+    { kw:'will insurance pay for a rental car during repairs', sv:70, url:'/the-extra-mile/advice/insurance/will-insurance-pay-for-a-rental-car-during-repairs', currRank:8, currRange:'07-10', prevRank:null, prevRange:'Not Ranking', diff:8 },
+    { kw:'how much does car insurance increase after an accident', sv:1000, url:'/the-extra-mile/advice/budget/how-much-does-car-insurance-increase-after-accident', currRank:8, currRange:'07-10', prevRank:7, prevRange:'07-10', diff:1 },
+    { kw:'dui car insurance', sv:50, url:'/the-extra-mile/advice/insurance/dui-car-insurance', currRank:8, currRange:'07-10', prevRank:null, prevRange:'Not Ranking', diff:8 },
+    { kw:'what is non owner car insurance', sv:390, url:'/the-extra-mile/advice/insurance/non-owner-car-insurance', currRank:8, currRange:'07-10', prevRank:null, prevRange:'Not Ranking', diff:8 },
+    { kw:'will insurance pay for rental car during repairs', sv:10, url:'/the-extra-mile/advice/insurance/will-insurance-pay-for-a-rental-car-during-repairs', currRank:8, currRange:'07-10', prevRank:null, prevRange:'Not Ranking', diff:8 },
+    { kw:'do you need insurance to drive someone else\'s car', sv:390, url:'/the-extra-mile/advice/budget/do-you-need-insurance-to-drive-someone-elses-car', currRank:8, currRange:'07-10', prevRank:null, prevRange:'Not Ranking', diff:8 },
+    { kw:'how are car insurance rates determined', sv:90, url:'/the-extra-mile/advice/budget/how-your-insurance-premiums-are-calculated', currRank:8, currRange:'07-10', prevRank:6, prevRange:'4-6', diff:2 },
+    { kw:'how much does car insurance increase after accident', sv:10, url:'/the-extra-mile/advice/budget/how-much-does-car-insurance-increase-after-accident', currRank:9, currRange:'07-10', prevRank:8, prevRange:'07-10', diff:1 },
+    { kw:'do i need insurance to drive someone else\'s car', sv:110, url:'/the-extra-mile/advice/budget/do-you-need-insurance-to-drive-someone-elses-car', currRank:10, currRange:'07-10', prevRank:56, prevRange:'31-100', diff:-46 },
+    { kw:'does bundling insurance save money', sv:50, url:'/the-extra-mile/advice/insurance/bundling-home-and-auto-insurance', currRank:11, currRange:'11-20', prevRank:25, prevRange:'21-30', diff:-14 },
+    { kw:'does homeowners insurance cover water damage', sv:30, url:'/the-extra-mile/advice/insurance/does-homeowners-insurance-cover-water-damage', currRank:11, currRange:'11-20', prevRank:5, prevRange:'4-6', diff:6 },
+    { kw:'does homeowners insurance cover water damage', sv:30, url:'/the-extra-mile/advice/insurance/does-homeowners-insurance-cover-water-damage', currRank:11, currRange:'11-20', prevRank:5, prevRange:'4-6', diff:6 },
+    { kw:'sudden water damage covered', sv:0, url:'/the-extra-mile/advice/insurance/does-homeowners-insurance-cover-water-damage', currRank:11, currRange:'11-20', prevRank:null, prevRange:'Not Ranking', diff:11 },
+    { kw:'how to lower car insurance', sv:1000, url:'/the-extra-mile/advice/insurance/how-to-lower-your-car-insurance', currRank:11, currRange:'11-20', prevRank:5, prevRange:'4-6', diff:6 },
+    { kw:'insurance carrier meaning', sv:10, url:'/the-extra-mile/advice/budget/insurance-carrier-vs-agency', currRank:12, currRange:'11-20', prevRank:12, prevRange:'11-20', diff:0 },
+    { kw:'comprehensive vs collision insurance', sv:660, url:'/the-extra-mile/advice/budget/comprehensive-and-collision-insurance-whats-the-difference', currRank:12, currRange:'11-20', prevRank:32, prevRange:'31-100', diff:-20 },
+    { kw:'loan lease payoff coverage', sv:590, url:'/the-extra-mile/advice/budget/what-is-gap-insurance', currRank:13, currRange:'11-20', prevRank:11, prevRange:'11-20', diff:2 },
+    { kw:'subrogation insurance claim', sv:170, url:'/the-extra-mile/advice/budget/what-is-subrogation-in-an-insurance-claim', currRank:13, currRange:'11-20', prevRank:15, prevRange:'11-20', diff:-2 },
+    { kw:'term vs whole life insurance', sv:14800, url:'/the-extra-mile/advice/budget/what-is-the-difference-between-whole-life-and-term-life-insurance', currRank:14, currRange:'11-20', prevRank:51, prevRange:'31-100', diff:-37 },
+    { kw:'insurance carrier definition', sv:10, url:'/the-extra-mile/advice/budget/insurance-carrier-vs-agency', currRank:14, currRange:'11-20', prevRank:14, prevRange:'11-20', diff:0 },
+    { kw:'car insurance bundling discount', sv:0, url:'/the-extra-mile/advice/insurance/bundling-home-and-auto-insurance', currRank:14, currRange:'11-20', prevRank:10, prevRange:'07-10', diff:4 },
+    { kw:'does homeowners insurance cover power surges', sv:70, url:'/the-extra-mile/advice/home/home-experiences-a-power-surge', currRank:15, currRange:'11-20', prevRank:null, prevRange:'Not Ranking', diff:15 },
+    { kw:'discount for bundling home and auto', sv:10, url:'/the-extra-mile/advice/insurance/bundling-home-and-auto-insurance', currRank:21, currRange:'21-30', prevRank:15, prevRange:'11-20', diff:6 },
+    { kw:'what is med pay', sv:590, url:'/the-extra-mile/advice/insurance/medical-payments-coverage-car-insurance', currRank:22, currRange:'21-30', prevRank:null, prevRange:'Not Ranking', diff:22 },
+    { kw:'usage-based insurance', sv:320, url:'/the-extra-mile/advice/insurance/usage-based-insurance', currRank:22, currRange:'21-30', prevRank:25, prevRange:'21-30', diff:-3 },
+    { kw:'medical payment coverage car insurance', sv:390, url:'/the-extra-mile/advice/insurance/medical-payments-coverage-car-insurance', currRank:23, currRange:'21-30', prevRank:null, prevRange:'Not Ranking', diff:23 },
+    { kw:'what is liability insurance', sv:6600, url:'/the-extra-mile/advice/budget/what-is-liability-insurance', currRank:24, currRange:'21-30', prevRank:13, prevRange:'11-20', diff:11 },
+    { kw:'does insurance cover rental car for repairs', sv:70, url:'/the-extra-mile/advice/insurance/will-insurance-pay-for-a-rental-car-during-repairs', currRank:24, currRange:'21-30', prevRank:null, prevRange:'Not Ranking', diff:24 },
+    { kw:'hail damage homeowners insurance', sv:30, url:'/the-extra-mile/advice/insurance/severe-storms-insurance-cover-hail-damage', currRank:24, currRange:'21-30', prevRank:26, prevRange:'21-30', diff:-2 },
+    { kw:'hail damage homeowners insurance', sv:30, url:'/the-extra-mile/advice/insurance/severe-storms-insurance-cover-hail-damage', currRank:24, currRange:'21-30', prevRank:26, prevRange:'21-30', diff:-2 },
+    { kw:'does car insurance go up after an accident', sv:90, url:'/the-extra-mile/advice/budget/how-much-does-car-insurance-increase-after-accident', currRank:24, currRange:'21-30', prevRank:13, prevRange:'11-20', diff:11 },
+    { kw:'pros and cons of bundling insurance', sv:30, url:'/the-extra-mile/advice/insurance/bundling-home-and-auto-insurance', currRank:26, currRange:'21-30', prevRank:5, prevRange:'4-6', diff:21 },
+    { kw:'what is medical payments on auto insurance', sv:140, url:'/the-extra-mile/advice/insurance/medical-payments-coverage-car-insurance', currRank:26, currRange:'21-30', prevRank:null, prevRange:'Not Ranking', diff:26 },
+    { kw:'does homeowners insurance cover flooding', sv:10, url:'/the-extra-mile/advice/insurance/does-homeowners-insurance-cover-water-damage', currRank:26, currRange:'21-30', prevRank:null, prevRange:'Not Ranking', diff:26 },
+    { kw:'difference between term and whole life insurance', sv:1300, url:'/the-extra-mile/advice/budget/what-is-the-difference-between-whole-life-and-term-life-insurance', currRank:30, currRange:'21-30', prevRank:46, prevRange:'31-100', diff:-16 },
+    { kw:'what is a sr22', sv:10, url:'/the-extra-mile/advice/insurance/what-is-sr-22-insurance', currRank:31, currRange:'31-100', prevRank:null, prevRange:'Not Ranking', diff:31 },
+    { kw:'does car insurance cover rentals for repairs', sv:70, url:'/the-extra-mile/advice/insurance/will-insurance-pay-for-a-rental-car-during-repairs', currRank:33, currRange:'31-100', prevRank:null, prevRange:'Not Ranking', diff:33 },
+    { kw:'car insurance without owning a car', sv:70, url:'/the-extra-mile/advice/insurance/non-owner-car-insurance', currRank:35, currRange:'31-100', prevRank:null, prevRange:'Not Ranking', diff:35 },
+    { kw:'liability insurance rental car', sv:180, url:'/the-extra-mile/sponsored/are-you-covered-under-personal-insurance-when-renting-a-car', currRank:35, currRange:'31-100', prevRank:null, prevRange:'Not Ranking', diff:35 },
+    { kw:'totaled car meaning', sv:150, url:'/the-extra-mile/advice/car/car-considered-totaled', currRank:36, currRange:'31-100', prevRank:42, prevRange:'31-100', diff:-6 },
+    { kw:'how to lower car insurance after accident', sv:110, url:'/the-extra-mile/advice/insurance/how-to-lower-your-car-insurance', currRank:42, currRange:'31-100', prevRank:27, prevRange:'21-30', diff:15 },
+    { kw:'wedding insurance', sv:6600, url:'/the-extra-mile/advice/life/is-wedding-insurance-worth-it', currRank:43, currRange:'31-100', prevRank:7, prevRange:'07-10', diff:36 },
+    { kw:'what does it mean if a car is totaled', sv:210, url:'/the-extra-mile/advice/car/car-considered-totaled', currRank:44, currRange:'31-100', prevRank:40, prevRange:'31-100', diff:4 },
+    { kw:'how to avoid distracted driving', sv:70, url:'/the-extra-mile/advice/car/how-to-prevent-driving-intexticated', currRank:47, currRange:'31-100', prevRank:49, prevRange:'31-100', diff:-2 },
+    { kw:'car insurance medical payments', sv:10, url:'/the-extra-mile/advice/insurance/medical-payments-coverage-car-insurance', currRank:48, currRange:'31-100', prevRank:null, prevRange:'Not Ranking', diff:48 },
+    { kw:'auto insurance', sv:673000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance', sv:450000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance quotes', sv:450000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'term life insurance', sv:450000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cheap car insurance', sv:301000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'renters insurance', sv:301000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'pet insurance', sv:246000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'travel insurance', sv:201000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'homeowners insurance', sv:135000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home insurance', sv:135000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'homeowners insurance quote', sv:96200, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'pet insurance for dogs', sv:96200, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sr 22', sv:60500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance companies', sv:60500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'liability car insurance', sv:60500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sr22 insurance', sv:47500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'full coverage car insurance', sv:33100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'motorcycle insurance', sv:33100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance near me', sv:27800, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'classic car insurance', sv:27100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is gap insurance', sv:27100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'umbrella insurance', sv:27100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'best car insurance', sv:22400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'small business insurance', sv:22400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'uninsured motorist coverage', sv:22200, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'best pet insurance', sv:22200, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'life insurance for seniors', sv:22200, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'rv insurance', sv:20100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance near me', sv:19100, url:'/insurance/agents', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much is renters insurance', sv:18100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'average cost of homeowners insurance', sv:14800, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance card', sv:12100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'general liability insurance for small business', sv:12100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'flood insurance', sv:12100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'boat insurance', sv:12100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'high risk auto insurance', sv:10800, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance fraud', sv:9900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance scamming', sv:9900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'is pet insurance worth it', sv:9900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'business liability insurance', sv:9900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for seniors', sv:8100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to clean dryer vent', sv:8000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'condo insurance', sv:8000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'pay as you go car insurance', sv:6600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to put out a grease fire', sv:6600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'best homeowners insurance', sv:6600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto and homeowners insurance bundle', sv:6600, url:'/the-extra-mile/advice/insurance/bundling-home-and-auto-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'renters insurance cost', sv:6600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is umbrella insurance', sv:6600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'trip cancellation insurance', sv:6600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much life insurance do i need', sv:5700, url:'/insurance/askanagent/life-insurance-checklist', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is subro', sv:5400, url:'/the-extra-mile/advice/budget/what-is-subrogation-in-an-insurance-claim', currRank:null, currRange:'Not Ranking', prevRank:18, prevRange:'11-20', diff:-18 },
+    { kw:'how to get car insurance', sv:5400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'pip insurance', sv:5400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to prepare for a winter storm', sv:5400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'credit card rental car insurance', sv:4400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'high risk car insurance', sv:4400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance card', sv:4400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'new car and insurance for new drivers', sv:4400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance carrier', sv:4400, url:'/the-extra-mile/advice/budget/insurance-carrier-vs-agency', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance card', sv:3600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cancel policy', sv:3600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for new drivers', sv:3600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what to do after a car accident', sv:3600, url:'/the-extra-mile/series/the-extra-mile-magazine/what-to-do-after-a-car-accident', currRank:null, currRange:'Not Ranking', prevRank:42, prevRange:'31-100', diff:-42 },
+    { kw:'rideshare insurance', sv:3200, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'trailer insurance', sv:3200, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'homeowners insurance discounts', sv:2900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'non owner sr22 insurance', sv:2900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what does homeowners insurance cover', sv:2900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'personal property insurance', sv:2900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what are insurance scams', sv:2400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what does pet insurance cover', sv:2400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance deductible', sv:2400, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'rideshare insurance for uber drivers', sv:1900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'uninsured motorist insurance', sv:1900, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'windshield glass replacement', sv:1800, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance companies for uber', sv:1600, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance for high risk drivers', sv:1500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'uber insurance', sv:1500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how does pet insurance work', sv:1500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is uninsured motorist coverage', sv:1500, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'dui insurance', sv:1300, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'who\'s fault', sv:1300, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance id card', sv:1300, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how does car insurance work', sv:1300, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much does insurance go up after speeding ticket', sv:1300, url:'/the-extra-mile/advice/budget/how-much-does-car-insurance-increase-after-accident', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how does car insurance work', sv:1300, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance for new car', sv:1100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'rv insurance cost', sv:1100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much does a speeding ticket increase insurance', sv:1000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cancel vehicle insurance', sv:1000, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'at fault accident', sv:990, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'who is at fault', sv:920, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is liability car insurance', sv:920, url:'/the-extra-mile/advice/budget/what-is-liability-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sr22 auto insurance', sv:880, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cancel auto insurance', sv:880, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how long does accident stay on insurance', sv:880, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cyber insurance for small business', sv:880, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to cancel car insurance', sv:810, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'good student discount', sv:810, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car and homeowners insurance bundle', sv:810, url:'/the-extra-mile/advice/insurance/bundling-home-and-auto-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'whos fault is it', sv:760, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'student car insurance', sv:760, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'full coverage car insurance cost', sv:660, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'ins card', sv:610, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'smoke detector placement', sv:610, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home insurance discount for security system', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'alarm system home insurance discount', sv:590, url:'/the-extra-mile/advice/insurance/smart-home-devices-that-lower-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sports car insurance', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'luxury car insurance', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does my credit card cover rental car insurance', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'will my credit card cover rental car insurance', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cheap car insurance with dui', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance companies for high risk drivers', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'best insurance for high risk drivers', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'at fault state', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how do i get proof of insurance', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance modified cars', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'horse trailer insurance', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does homeowners insurance cover burst pipes', sv:590, url:'/the-extra-mile/advice/insurance/homeowners-insurance-frozen-pipes-ice-dams', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does homeowners insurance cover fire', sv:590, url:'/the-extra-mile/advice/insurance/does-homeowners-insurance-cover-fire', currRank:null, currRange:'Not Ranking', prevRank:28, prevRange:'21-30', diff:-28 },
+    { kw:'does homeowners insurance cover burst pipes', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'do i need flood insurance', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'least expensive suv to insure', sv:590, url:'/the-extra-mile/advice/car/the-most-and-least-expensive-car-brands-to-insure', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance payout for totaled car', sv:590, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'daily car insurance', sv:540, url:'/the-extra-mile/advice/insurance/temporary-car-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'hail damage insurance claim', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'roof damage insurance claim', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'hail damage insurance claim', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'roof damage insurance claim', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'homeowners insurance security system discount', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'security system discount on homeowners insurance', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'do credit cards cover rental car insurance', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much is car insurance for a new car', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much for insurance on a new car', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'commercial auto insurance for rideshare drivers', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for divorced parents', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance claim process', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'automobile insurance claims process', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance claim process', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance claim procedure', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'modified car insurance', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'modified vehicle insurance', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'can u cancel car insurance anytime', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'kitchen fire prevention', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what to do if your car is stolen', sv:480, url:'/the-extra-mile/advice/car/will-your-insurance-really-cover-a-stolen-car', currRank:null, currRange:'Not Ranking', prevRank:68, prevRange:'31-100', diff:-68 },
+    { kw:'average annual car insurance cost', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what does car insurance cover', sv:480, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance premium definition', sv:410, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does homeowners insurance cover basement flooding', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to file a home insurance claim', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how long does a dui affect your insurance', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what cars have the lowest insurance rates', sv:390, url:'/the-extra-mile/advice/car/the-most-and-least-expensive-car-brands-to-insure', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does car insurance pay for repairs', sv:390, url:'/the-extra-mile/advice/car/when-does-car-insurance-cover-repairs', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home insurance for first-time buyers', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does homeowners insurance cover mold', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to prevent house fire', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'hail damage to roof insurance claim', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'business insurance coverage', sv:390, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what homeowners insurance does not cover', sv:390, url:'/the-extra-mile/series/the-extra-mile-magazine/what-homeowners-insurance-does-not-cover', currRank:null, currRange:'Not Ranking', prevRank:19, prevRange:'11-20', diff:-19 },
+    { kw:'water damage restoration cost', sv:370, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'one day car insurance', sv:330, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'non owner car insurance cost', sv:320, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much does insurance go up after a dui', sv:320, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'is insurance more expensive for a new car', sv:320, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance claim', sv:320, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does homeowners insurance cover frozen pipes', sv:320, url:'/the-extra-mile/advice/insurance/homeowners-insurance-frozen-pipes-ice-dams', currRank:null, currRange:'Not Ranking', prevRank:26, prevRange:'21-30', diff:-26 },
+    { kw:'does homeowners insurance cover theft', sv:320, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance students', sv:290, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'first time car insurance', sv:290, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much is full coverage car insurance', sv:290, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance cover a hit and run', sv:290, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to file an insurance claim', sv:290, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to insure a car', sv:270, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how does home insurance deductible work', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'classic car insurance cost', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'credit cards with rental car benefits', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'best car insurance for dui', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance cost for new car', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'transfer car insurance', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'transfer auto insurance', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is an at fault accident', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'fire prevention tips home', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'ways to lower auto insurance', sv:260, url:'/the-extra-mile/prepare/car/how-to-lower-your-auto-insurance-premiums', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'ways to reduce car insurance', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home fire safety tips', sv:260, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'difference between comprehensive and collision', sv:220, url:'/the-extra-mile/advice/budget/comprehensive-and-collision-insurance-whats-the-difference', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance subrogation', sv:210, url:'/the-extra-mile/advice/budget/what-is-subrogation-in-an-insurance-claim', currRank:null, currRange:'Not Ranking', prevRank:19, prevRange:'11-20', diff:-19 },
+    { kw:'does comprehensive insurance cover theft', sv:210, url:'/the-extra-mile/advice/car/will-your-insurance-really-cover-a-stolen-car', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'severe weather preparedness', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'severe weather preparedness', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how long does a home insurance claim take', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'pay per day car insurance', sv:210, url:'/the-extra-mile/advice/insurance/temporary-car-insurance', currRank:null, currRange:'Not Ranking', prevRank:9, prevRange:'07-10', diff:-9 },
+    { kw:'auto insurance declaration page example', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sample auto insurance declaration page', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance declaration page sample', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'windshield replacement insurance', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how do you get car insurance', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'should i get term or whole life insurance', sv:210, url:'/the-extra-mile/advice/budget/what-is-the-difference-between-whole-life-and-term-life-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what temperature do pipes freeze', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to calculate insurance premium', sv:210, url:'/the-extra-mile/advice/budget/how-your-insurance-premiums-are-calculated', currRank:null, currRange:'Not Ranking', prevRank:12, prevRange:'11-20', diff:-12 },
+    { kw:'understanding car insurance', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does homeowners insurance cover foundation cracks', sv:210, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home insurance claim process', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how does a home insurance claim work', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'high performance car insurance', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for high performance cars', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'policy declarations', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to keep pipes from freezing', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'driver insurance to drive any car', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'homeowners insurance calculator', sv:170, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for college students', sv:150, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'classic car insurance requirements', sv:140, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much medical payments coverage do i need', sv:140, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is rental reimbursement', sv:140, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how does rental reimbursement work', sv:140, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does full coverage cover hit and run', sv:140, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'vehicle insurance card', sv:120, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what are premiums in insurance', sv:120, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sewer backup coverage', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home insurance claim denied', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance medical payments vs bodily injury', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much to add a car to insurance', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance declaration page example', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance declaration letter', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance cover aftermarket parts', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home fire safety checklist', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sewer backup coverage', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cheapest luxury car insurance', sv:110, url:'/the-extra-mile/advice/car/the-most-and-least-expensive-car-brands-to-insure', currRank:null, currRange:'Not Ranking', prevRank:14, prevRange:'11-20', diff:-14 },
+    { kw:'does car insurance cover hit and run', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'winter home maintenance checklist', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'mortgage insurance vs life insurance', sv:110, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to prevent frozen pipes', sv:100, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'burst pipe insurance', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'burst pipe insurance', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is sr 22', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'sports car insurance cost', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'pip vs med pay', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what does rental reimbursement mean', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does car insurance go up with a new car', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is storage insurance for a car', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'moving car insurance', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'moving auto insurance', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'trailer coverage', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance cover abroad', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does us car insurance work in canada', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'international car insurance coverage', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'overseas car insurance', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'do other countries have car insurance', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much does a vet visit cost', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how many smoke detectors do i need', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'burst pipe insurance', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how many accidents are caused by distracted driving', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'common insurance terms', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does car insurance cover rental car', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to protect home from flooding', sv:90, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to get insurance for car', sv:80, url:'/the-extra-mile/advice/insurance/how-to-choose-the-best-car-insurance-for-you', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to get classic car insurance', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance when moving states', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance after divorce', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'will my car insurance cover me in another state', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance cover ice dam damage', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does home insurance cover water damage', sv:70, url:'/the-extra-mile/advice/insurance/does-homeowners-insurance-cover-water-damage', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance cost per year', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'can i drive someone else\'s insured car', sv:70, url:'/the-extra-mile/advice/budget/do-you-need-insurance-to-drive-someone-elses-car', currRank:null, currRange:'Not Ranking', prevRank:22, prevRange:'21-30', diff:-22 },
+    { kw:'does car insurance cover repairs', sv:70, url:'/the-extra-mile/advice/car/when-does-car-insurance-cover-repairs', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'hit and run insurance', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance terminology explained', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much is life insurance per month', sv:70, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does car insurance cover hail damage', sv:60, url:'/the-extra-mile/advice/car/does-car-insurance-cover-hail-damage', currRank:null, currRange:'Not Ranking', prevRank:9, prevRange:'07-10', diff:-9 },
+    { kw:'is bundling home and auto insurance worth it', sv:50, url:'/the-extra-mile/advice/insurance/bundling-home-and-auto-insurance', currRank:null, currRange:'Not Ranking', prevRank:20, prevRange:'11-20', diff:-20 },
+    { kw:'what does classic car insurance cover', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'parked car insurance', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to switch car insurance to another state', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'transferring car insurance to another state', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance after divorce', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car accident insurance claim', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance abroad', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance abroad', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance company check driving record', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'most expensive car insurance', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to choose an insurance agent', sv:50, url:'/the-extra-mile/advice/budget/whats-the-best-way-to-buy-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance glossary', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'glossary of insurance terms', sv:50, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance cover hail damage', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance cover hail damage', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'are smart home devices worth it', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'alarm discount homeowners insurance', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'antique auto insurance', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is considered a sports car for insurance', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance moving out of state', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'divorce and car insurance', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance for fraud', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is insurance fraud', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how often does car insurance renew', sv:40, url:'/the-extra-mile/advice/car/12-month-insurance-policy-benefits', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does credit score affect car insurance', sv:40, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how do smart home devices work', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'smart home insurance discount', sv:30, url:'/the-extra-mile/advice/insurance/smart-home-devices-that-lower-insurance', currRank:null, currRange:'Not Ranking', prevRank:40, prevRange:'31-100', diff:-40 },
+    { kw:'what is considered a classic car for insurance', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cheapest car insurance for high risk drivers', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance during separation', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to cancel auto insurance', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'student discount car insurance', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'term vs whole life cost', sv:30, url:'/the-extra-mile/advice/budget/what-is-the-difference-between-whole-life-and-term-life-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'why does my car insurance keep going up', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance agent tips', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance deductible definition', sv:30, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'flood vs water damage', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car storage insurance', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'vehicle storage insurance', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'garaged car', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance divorce', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'custom car insurance', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'custom auto insurance', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much does insurance go up after a speeding ticket', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to obtain car insurance', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'flood vs water damage', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance basics', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'wedding liability insurance', sv:20, url:'/the-extra-mile/advice/life/is-wedding-insurance-worth-it', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home burglary prevention', sv:20, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'medpay', sv:10, url:'/the-extra-mile/advice/insurance/medical-payments-coverage-car-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'home insurance risks', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'smart home technology benefits', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'smart home devices that save money', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'security camera insurance discount', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'1 month car insurance', sv:10, url:'/the-extra-mile/advice/insurance/temporary-car-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for drunk drivers', sv:10, url:'/the-extra-mile/advice/insurance/dui-car-insurance', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance for bad driving record', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'cheap auto insurance with bad driving record', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'rideshare insurance endorsement', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'rideshare insurance quote', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'rideshare insurance policy', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance declaration page example', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'windshield repair insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance fix windshield', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'windshield repair and insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance cover broken windshield', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'windshield replacement insurance coverage', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'windshield replacement cost insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto storage insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for car in storage', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'long term storage of car', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance with claims', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance claim meaning', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'not at fault accidents', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'whose fault was it', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how do you get a new insurance card', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for custom cars', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'custom vehicle insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'will a speeding ticket affect insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'do speeding fines affect insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does a first time speeding ticket affect insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does a traffic citation affect insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does a traffic infraction affect insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much will speeding ticket increase insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to stop insurance policy', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance cancelation', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'fraudulent insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is fraud in insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance fraud', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'student auto insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance student discount', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'good student discount car insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance for truck and trailer', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'trailer truck insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'utility trailer insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'do i have to insure a trailer', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'do trailers need insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'auto insurance for first time buyers', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'first time driving insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'winter storm preparedness checklist', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'where to put smoke detectors', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'fire prevention checklist', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does homeowners insurance cover roof leaks', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'texting while driving statistics', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'is texting while driving illegal', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'personal insurance for rental cars', sv:10, url:'/the-extra-mile/sponsored/are-you-covered-under-personal-insurance-when-renting-a-car', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'comp vs collision insurance', sv:10, url:'/the-extra-mile/advice/budget/comprehensive-and-collision-insurance-whats-the-difference', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is an insurance carrier', sv:10, url:'/the-extra-mile/advice/budget/insurance-carrier-vs-agency', currRank:null, currRange:'Not Ranking', prevRank:10, prevRange:'07-10', diff:-10 },
+    { kw:'how to get lower car insurance', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what is an auto insurance premium', sv:10, url:'/the-extra-mile/advice/budget/how-your-insurance-premiums-are-calculated', currRank:null, currRange:'Not Ranking', prevRank:49, prevRange:'31-100', diff:-49 },
+    { kw:'car insurance explained', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'gap insurance for car loan', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'will car insurance cover repairs', sv:10, url:'/the-extra-mile/advice/car/when-does-car-insurance-cover-repairs', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'uninsured driver protection', sv:10, url:'/the-extra-mile/series/the-extra-mile-magazine/protecting-yourself-against-uninsured-drivers', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'does insurance cover hit and run', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'what does an insurance agent do', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'insurance terms for beginners', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'basic car insurance terms', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'total loss car claim', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car total loss payout', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how much homeowners insurance do i need', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'homeowners insurance for older homes', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'life insurance beneficiary rules', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to prevent home break in', sv:10, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'smart home insurance discounts', sv:0, url:'/the-extra-mile/advice/insurance/smart-home-devices-that-lower-insurance', currRank:null, currRange:'Not Ranking', prevRank:10, prevRange:'07-10', diff:-10 },
+    { kw:'spring storm preparation', sv:0, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'spring storm home checklist', sv:0, url:'/the-extra-mile/advice/home/protect-your-home-during-any-season', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'roof storm damage coverage', sv:0, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'spring storm insurance claim', sv:0, url:'/the-extra-mile/advice/insurance/severe-storms-insurance-cover-hail-damage', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'adding a teen to car insurance', sv:0, url:'/the-extra-mile/advice/insurance/adding-teens-to-your-car-insurance', currRank:null, currRange:'Not Ranking', prevRank:7, prevRange:'07-10', diff:-7 },
+    { kw:'what to do if roof is damaged', sv:0, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'car insurance for bad credit', sv:0, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'when does car insurance cover repairs', sv:0, url:'/the-extra-mile/advice/car/when-does-car-insurance-cover-repairs', currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+    { kw:'how to prevent water damage in home', sv:0, url:null, currRank:null, currRange:'Not Ranking', prevRank:null, prevRange:'Not Ranking', diff:0 },
+  ],
+  rankBucket: [
+    { week:'2 Nov - 8 Nov', top3:5, top3sv:1000, top6:17, top6sv:15640, top10:28, top10sv:24500, top20:43, top20sv:38390, top30:51, top30sv:39910, top100:65, top100sv:62300 },
+    { week:'9 Nov - 15 Nov', top3:9, top3sv:2730, top6:23, top6sv:71690, top10:33, top10sv:73820, top20:46, top20sv:91240, top30:59, top30sv:100850, top100:69, top100sv:108330 },
   ]
 };
 
@@ -493,7 +1051,7 @@ function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete chart
 // ============================================================
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => {
-    const names = ['overview','wow','mom','pages'];
+    const names = ['overview','wow','mom','pages','keywordrank','rankbucket'];
     t.classList.toggle('active', names[i] === name);
   });
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -503,6 +1061,8 @@ function switchTab(name) {
   if (name === 'wow' && !charts.clicks) renderWoW();
   if (name === 'mom' && !charts.momClicks) renderMoMChart();
   if (name === 'pages' && !charts.pagesBar) renderPagesCharts();
+  if (name === 'keywordrank' && !charts.kwMovers) renderKeywordRank();
+  if (name === 'rankbucket' && !charts.rbBucket) renderRankBucket();
 }
 
 // ============================================================
@@ -813,6 +1373,172 @@ function renderPagesCharts() {
       <td class="num-r" style="color:#111827">${p.prevImp != null ? p.prevImp.toLocaleString() : '—'}</td>
       <td class="num-r">${chgBadge(p.chg)}</td>
       <td class="num-r">${chgBadge(p.impChg)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// KEYWORD RANK
+// ============================================================
+function renderKeywordRank() {
+  const kws = DATA.keywordRank;
+  const ranking = kws.filter(k => k.currRank !== null);
+  const newlyRanking = kws.filter(k => k.currRank !== null && k.prevRank === null);
+  const droppedOff = kws.filter(k => k.currRank === null && k.prevRank !== null);
+  const bothRanking = kws.filter(k => k.currRank !== null && k.prevRank !== null);
+  const improved = bothRanking.filter(k => k.diff < 0);
+  const declined = bothRanking.filter(k => k.diff > 0);
+
+  const kpis = [
+    { lbl:'Keywords Tracked', val: kws.length, cls:'c1', sub:'total in rank tracker' },
+    { lbl:'Currently Ranking', val: ranking.length, cls:'c4', sub:'in top 100' },
+    { lbl:'Newly Ranking', val: newlyRanking.length, cls:'c3', sub:'vs prior week' },
+    { lbl:'Dropped Off', val: droppedOff.length, cls:'c2', sub:'vs prior week' },
+    { lbl:'Improved', val: improved.length, cls:'c4', sub:'moved up in rank' },
+    { lbl:'Declined', val: declined.length, cls:'c2', sub:'moved down in rank' },
+  ];
+  document.getElementById('kwKpiGrid').innerHTML = kpis.map(k => `<div class="kpi ${k.cls}">
+    <div class="kpi-lbl">${k.lbl}</div>
+    <div class="kpi-val">${fmtFull(k.val)}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+
+  // Biggest movers: combine improved + newly ranking (negative shown as improvement) and declined + dropped off
+  const movers = kws
+    .filter(k => k.currRank !== null || k.prevRank !== null)
+    .map(k => {
+      let moveVal;
+      if (k.currRank !== null && k.prevRank !== null) moveVal = k.prevRank - k.currRank; // positive = improved
+      else if (k.currRank !== null && k.prevRank === null) moveVal = k.currRank <= 10 ? 15 : 5; // newly ranking = improvement
+      else moveVal = -(k.prevRank || 0) - 5; // dropped off = decline
+      return { kw:k.kw, moveVal, currRank:k.currRank, prevRank:k.prevRank };
+    })
+    .filter(k => k.moveVal !== 0)
+    .sort((a,b) => Math.abs(b.moveVal) - Math.abs(a.moveVal))
+    .slice(0, 12);
+
+  function kwLabel(k) { return k.length > 34 ? k.slice(0,32)+'…' : k; }
+
+  destroyChart('kwMovers');
+  charts.kwMovers = new Chart(document.getElementById('kwMoversBar'), {
+    type:'bar',
+    data:{
+      labels: movers.map(m => kwLabel(m.kw)),
+      datasets:[{
+        label:'Position Change', data: movers.map(m => m.moveVal),
+        backgroundColor: movers.map(m => m.moveVal > 0 ? 'rgba(34,197,94,.25)' : 'rgba(204,0,0,.2)'),
+        borderColor: movers.map(m => m.moveVal > 0 ? '#22c55e' : '#CC0000'),
+        borderWidth:1.5, borderRadius:4
+      }]
+    },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{
+        title: items => movers[items[0].dataIndex].kw,
+        label: c => { const m = movers[c.dataIndex]; const cr = m.currRank ?? 'Not Ranking'; const pr = m.prevRank ?? 'Not Ranking'; return ` ${pr} → ${cr}`; }
+      }} },
+      scales:{ x:{grid:{color:'#f3f4f6'},ticks:{font:{size:9}}}, y:{grid:{display:false},ticks:{font:{size:9},padding:4}} }
+    }
+  });
+
+  renderKwTableRows(kws);
+}
+
+function renderKwTableRows(list) {
+  const body = document.getElementById('kwTableBody');
+  if (!list.length) {
+    body.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:20px">No keywords or URLs match your search.</td></tr>`;
+    return;
+  }
+  body.innerHTML = list.map(k => {
+    const diffDisplay = (k.currRank === null && k.prevRank === null) ? '—' : (k.diff > 0 ? `+${k.diff}` : `${k.diff}`);
+    const diffCls = k.currRank === null && k.prevRank !== null ? 'dn' : (k.prevRank === null && k.currRank !== null ? 'up' : (k.diff < 0 ? 'up' : k.diff > 0 ? 'dn' : 'nt'));
+    const urlDisplay = k.url ? ('cluballiance.aaa.com' + (k.url === '/' ? '/' : k.url)) : '—';
+    return `<tr>
+      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${k.kw}</td>
+      <td class="num-r">${fmtFull(k.sv)}</td>
+      <td class="url-td" title="${urlDisplay}" style="max-width:220px">${urlDisplay}</td>
+      <td class="num-r fw">${k.currRank ?? '—'}</td>
+      <td class="num-r">${k.prevRank ?? '—'}</td>
+      <td>${k.prevRange}</td>
+      <td class="num-r"><span class="badge ${diffCls}">${diffDisplay}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterKeywordTable(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) { renderKwTableRows(DATA.keywordRank); return; }
+  const filtered = DATA.keywordRank.filter(k =>
+    k.kw.toLowerCase().includes(q) || (k.url && k.url.toLowerCase().includes(q))
+  );
+  renderKwTableRows(filtered);
+}
+
+// ============================================================
+// RANK BUCKET
+// ============================================================
+function renderRankBucket() {
+  const rb = DATA.rankBucket;
+  const latest = rb[rb.length-1];
+  const prev = rb[rb.length-2];
+
+  function pctV(c,p){ return p ? ((c-p)/p*100).toFixed(1) : null; }
+  const kpis = [
+    { lbl:'Top 3',   val: latest.top3,   chg: pctV(latest.top3, prev?.top3),     cls:'c1' },
+    { lbl:'Top 10',  val: latest.top10,  chg: pctV(latest.top10, prev?.top10),   cls:'c2' },
+    { lbl:'Top 20',  val: latest.top20,  chg: pctV(latest.top20, prev?.top20),   cls:'c3' },
+    { lbl:'Top 100', val: latest.top100, chg: pctV(latest.top100, prev?.top100), cls:'c4' },
+  ];
+  document.getElementById('rbKpiGrid').innerHTML = kpis.map(k => `<div class="kpi ${k.cls}">
+    <div class="kpi-lbl">${k.lbl}</div>
+    <div class="kpi-val">${fmtFull(k.val)}</div>
+    <span class="kpi-chg ${chgClass(k.chg)}">${chgLabel(k.chg)}</span>
+    <div class="kpi-sub">keywords ranking</div>
+  </div>`).join('');
+
+  destroyChart('rbBucket');
+  charts.rbBucket = new Chart(document.getElementById('rbBucketChart'), {
+    type:'bar',
+    data:{
+      labels: ['Top 3','Top 6','Top 10','Top 20','Top 30','Top 100'],
+      datasets: rb.map((w,i) => ({
+        label: w.week,
+        data: [w.top3, w.top6, w.top10, w.top20, w.top30, w.top100],
+        backgroundColor: i === rb.length-1 ? 'rgba(37,99,235,.6)' : 'rgba(156,163,175,.4)',
+        borderColor: i === rb.length-1 ? '#2563eb' : '#9ca3af',
+        borderWidth:1.5, borderRadius:4
+      }))
+    },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom', labels:{font:{size:10},boxWidth:12}} },
+      scales:{ x:{grid:{display:false},ticks:{font:{size:10}}}, y:{grid:{color:'#f3f4f6'},ticks:{font:{size:9},callback:v=>fmtFull(v)}} }
+    }
+  });
+
+  function deltaBadge(curr, prev) {
+    if (prev == null) return '<span class="dbadge base">Base</span>';
+    const v = ((curr - prev) / prev * 100).toFixed(1);
+    const n = parseFloat(v);
+    const cls = n > 0 ? 'up' : n < 0 ? 'dn' : 'base';
+    const sign = n > 0 ? '+' : '';
+    return `<span class="dbadge ${cls}">${sign}${v}%</span>`;
+  }
+  document.getElementById('rbTableBody').innerHTML = rb.map((w, i) => {
+    const p = i === 0 ? null : rb[i-1];
+    return `<tr>
+      <td class="week-cell">${w.week}</td>
+      <td class="num">${w.top3}</td>
+      <td class="num">${fmtFull(w.top3sv)}</td>
+      <td class="num">${w.top6}</td>
+      <td class="num">${fmtFull(w.top6sv)}</td>
+      <td class="num">${w.top10}</td>
+      <td class="num">${fmtFull(w.top10sv)}</td>
+      <td class="num">${w.top20}</td>
+      <td class="num">${fmtFull(w.top20sv)}</td>
+      <td class="num">${w.top30}</td>
+      <td class="num">${fmtFull(w.top30sv)}</td>
+      <td class="num">${w.top100}</td>
+      <td class="num">${fmtFull(w.top100sv)}</td>
     </tr>`;
   }).join('');
 }
